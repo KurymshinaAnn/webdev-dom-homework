@@ -52,7 +52,30 @@ body {
 
   .comment-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+  }
+
+  .comment-button-edit {
+    margin-top: -1px;
+    font-size: 24px;
+    padding: 10px 20px;
+    background-color: #bcec30;
+    border: none;
+    border-radius: 36px;
+    cursor: pointer;
+  }
+
+  .comment-button-edit-save {
+    color:#ffffff;
+    background-color: rgba(255, 0, 0, 0.3);
+  }
+
+  .comment-text-edit {
+    font-size: 16px;
+    font-family: Helvetica;
+    border-radius: 8px;
+    border: none;
+    width: 500px;
   }
 
   .comment-body {
@@ -126,7 +149,7 @@ body {
     justify-content: flex-end;
   }
 
-  .add-form-button {
+    .add-form-button {
     margin-top: 24px;
     font-size: 24px;
     padding: 10px 20px;

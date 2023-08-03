@@ -86,6 +86,16 @@ body {
 
   .comment-text {
     font-size: 32px;
+    white-space: pre-line;
+  }
+
+  .quote {
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    background-color: rgba(188, 236, 48, 0.3);
   }
 
   .likes {

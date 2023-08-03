@@ -89,7 +89,7 @@ const initLikeListeners = () => {
 const initEditListeners = () => {
     for (const editButton of document.querySelectorAll('.comment-button-edit')) {
         editButton.addEventListener("click", () => {
-            const index = editButton.dataset.index;
+            const index = parseInt(editButton.dataset.index);
             commentsAll.filter((c, i) => i !== index).forEach((c) => c.isEdit = false);
             const comment = commentsAll[index];
             if (comment.isEdit) {

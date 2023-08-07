@@ -29,11 +29,12 @@ const commentsAll = [
 const initEventListeners = () => {
     initLikeListeners();
     initEditListeners();
+    initAnswerComments();
 };
 
 const renderComments = () => {
     const commentsHtml = commentsAll.map((comment, index) => {
-        return `<li class="comment" data-name="${comment.name}">
+        return `<li class="comment" data-name="${comment.name}" data-text="${comment.text}">
         <div class="comment-header">
           <div>${comment.name}</div>
           <div>${comment.time}</div>
@@ -65,13 +66,19 @@ const renderCommentsText = (comment) => {
     if (comment.isEdit) {
         return `<textarea class="comment-text-edit" id="edit-textarea" value="">${comment.text}</textarea>`
     } else {
-        return `<div class="comment-text" data-text="${comment.text}">${comment.text}</div>`
+        const renderedText = comment.text
+        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+        .replaceAll("QUOTE_END", "</div>");
+        return `<div class="comment-text" data-text="${comment.text}">
+        ${renderedText}
+        </div>`
     };
 };
 
 const initLikeListeners = () => {
     for (const likeButton of document.querySelectorAll('.like-button')) {
-        likeButton.addEventListener("click", () => {
+        likeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
 
             if (commentsAll[likeButton.dataset.index].liked) {
                 commentsAll[likeButton.dataset.index].likes--;
@@ -88,7 +95,8 @@ const initLikeListeners = () => {
 
 const initEditListeners = () => {
     for (const editButton of document.querySelectorAll('.comment-button-edit')) {
-        editButton.addEventListener("click", () => {
+        editButton.addEventListener("click", (event) => {
+            event.stopPropagation();
             const index = parseInt(editButton.dataset.index);
             commentsAll.filter((c, i) => i !== index).forEach((c) => c.isEdit = false);
             const comment = commentsAll[index];
@@ -99,6 +107,19 @@ const initEditListeners = () => {
                 comment.isEdit = true;
             }
             renderComments();
+        });
+    };
+};
+
+const initAnswerComments = () => {
+    for (const pressComments of document.querySelectorAll('.comment')) {
+        pressComments.addEventListener("click", () => {
+            const answer = pressComments.dataset.text;
+            const anotherAnswer = pressComments.dataset.name;
+
+            textInputElement.value = "QUOTE_BEGIN" + anotherAnswer + "\n" + answer + "QUOTE_END\n";
+            textInputElement.focus();
+            textInputElement.scrollTo();
         });
     };
 };
@@ -153,8 +174,12 @@ function comments() {
     const date = new Date();
 
     commentsAll.push({
-        name: nameInputElement.value,
-        text: textInputElement.value,
+        name: nameInputElement.value
+            .replaceAll("<", "&lt;")
+            .replaceAll("<", "&gt;"),
+        text: textInputElement.value
+            .replaceAll("<", "&lt;")
+            .replaceAll("<", "&gt;"),
         time: formatDateTime(date),
         likes: 0,
         liked: false,

@@ -1,30 +1,48 @@
 "use strict";
-const buttonElement = document.getElementById("add-button");
+
 const buttonElementDel = document.getElementById("add-button-delete");
 const listElement = document.getElementById("list");
-const nameInputElement = document.getElementById("name-input");
-const textInputElement = document.getElementById("text-input");
-
 const commentElements = document.querySelectorAll('.comment');
+const addFormElement = document.querySelectorAll(".add-form")[0];
+let isLoading = true;
 
-const commentsAll = [
-    {
-        name: "Глеб Фокин",
-        text: "Это будет первый комментарий на этой странице",
-        time: "12.02.22 12:18",
-        likes: 75,
-        liked: false,
-        isEdit: false,
-    },
-    {
-        name: "Варвара Новина",
-        text: "Мне нравится как оформлена эта страница! ❤",
-        time: "13.02.22 19:22",
-        likes: 62,
-        liked: false,
-        isEdit: false,
-    },
-];
+const nameInputElement = () => document.getElementById("name-input");
+const textInputElement = () => document.getElementById("text-input");
+const buttonElement = () => document.getElementById("add-button");
+
+const requestComment = () => {
+    const fetchPromise = fetch('https://wedev-api.sky.pro/api/v1/:ann-kurymshina/comments', {
+        method: "GET"
+    });
+
+    isLoading = true;
+    renderAddForm();
+
+    fetchPromise.then((response) => {
+        const jsonPromise = response.json();
+
+        jsonPromise.then((responseData) => {
+            console.log(responseData);
+
+            commentsAll = responseData.comments.map((comment) => {
+                return {
+                    name: comment.author.name,
+                    text: comment.text,
+                    time: new Date(comment.date),
+                    likes: comment.likes,
+                    liked: comment.false,
+                    isEdit: comment.isEdit,
+                };
+            });
+            isLoading = false;
+            renderComments();
+            renderAddForm();
+        });
+    });
+
+};
+
+let commentsAll = [];
 
 const initEventListeners = () => {
     initLikeListeners();
@@ -37,7 +55,7 @@ const renderComments = () => {
         return `<li class="comment" data-name="${comment.name}" data-text="${comment.text}">
         <div class="comment-header">
           <div>${comment.name}</div>
-          <div>${comment.time}</div>
+          <div>${formatDateTime(comment.time)}</div>
         </div>
         <div class="comment-body">
           ${renderCommentsText(comment)}
@@ -58,8 +76,28 @@ const renderComments = () => {
     }).join('');
 
     listElement.innerHTML = commentsHtml;
-
     initEventListeners();
+};
+
+const renderAddForm = () => {
+    if (isLoading) {
+        addFormElement.innerHTML = `
+        <div class="add-form-info">
+            <p class="add-form-addition">Загружаем комментарии</p>
+            <div class="add-form-spinner">
+                <div class="dots"></div>
+            </div>
+        </div>`
+    } else {
+        addFormElement.innerHTML = `
+        <input type="text" class="add-form-name" id="name-input" ; placeholder="Введите ваше имя" />
+        <textarea type="textarea" class="add-form-text" id="text-input" ; placeholder="Введите ваш коментарий"
+          rows="4"></textarea>
+        <div class="add-form-row">
+          <button class="add-form-button" id="add-button">Написать</button>
+        </div>`
+        initFormListeners();
+    }
 };
 
 const renderCommentsText = (comment) => {
@@ -67,8 +105,8 @@ const renderCommentsText = (comment) => {
         return `<textarea class="comment-text-edit" id="edit-textarea" value="">${comment.text}</textarea>`
     } else {
         const renderedText = comment.text
-        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-        .replaceAll("QUOTE_END", "</div>");
+            .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+            .replaceAll("QUOTE_END", "</div>");
         return `<div class="comment-text" data-text="${comment.text}">
         ${renderedText}
         </div>`
@@ -117,31 +155,30 @@ const initAnswerComments = () => {
             const answer = pressComments.dataset.text;
             const anotherAnswer = pressComments.dataset.name;
 
-            textInputElement.value = "QUOTE_BEGIN" + anotherAnswer + "\n" + answer + "QUOTE_END\n";
-            textInputElement.focus();
-            textInputElement.scrollTo();
+            textInputElement().value = "QUOTE_BEGIN" + anotherAnswer + "\n" + answer + "QUOTE_END\n";
+            textInputElement().focus();
+            textInputElement().scrollTo();
         });
     };
 };
 
-renderComments();
+const initFormListeners = () => {
+    nameInputElement().addEventListener('keyup', (ev) => {
+        if (ev.key === 'Enter') {
+            comments();
+        }
+    });
 
-nameInputElement.addEventListener('keyup', (ev) => {
-    if (ev.key === 'Enter') {
+    textInputElement().addEventListener('keyup', (ev) => {
+        if (ev.key === 'Enter') {
+            comments();
+        }
+    });
+
+    buttonElement().addEventListener("click", () => {
         comments();
-    }
-});
-
-textInputElement.addEventListener('keyup', (ev) => {
-    if (ev.key === 'Enter') {
-        comments();
-    }
-});
-
-
-buttonElement.addEventListener("click", () => {
-    comments();
-});
+    });
+}
 
 buttonElementDel.addEventListener("click", () => {
     commentsDel();
@@ -151,47 +188,42 @@ function comments() {
 
     let isValid = true;
 
-    nameInputElement.classList.remove("add-form-error");
-    if (nameInputElement.value === '') {
-        nameInputElement.classList.add("add-form-error");
+    nameInputElement().classList.remove("add-form-error");
+    if (nameInputElement().value === '') {
+        nameInputElement().classList.add("add-form-error");
         isValid = false;
-        nameInputElement.focus();
+        nameInputElement().focus();
     };
 
-    textInputElement.classList.remove("add-form-error");
-    if (textInputElement.value === '') {
-        textInputElement.classList.add("add-form-error");
+    textInputElement().classList.remove("add-form-error");
+    if (textInputElement().value === '') {
+        textInputElement().classList.add("add-form-error");
         isValid = false;
-        textInputElement.focus();
+        textInputElement().focus();
     };
 
-    buttonElement.classList.remove("add-form-button-error");
+    buttonElement().classList.remove("add-form-button-error");
     if (!isValid) {
-        buttonElement.classList.add("add-form-button-error");
+        buttonElement().classList.add("add-form-button-error");
         return;
     };
 
-    const date = new Date();
-
-    commentsAll.push({
-        name: nameInputElement.value
-            .replaceAll("<", "&lt;")
-            .replaceAll("<", "&gt;"),
-        text: textInputElement.value
-            .replaceAll("<", "&lt;")
-            .replaceAll("<", "&gt;"),
-        time: formatDateTime(date),
-        likes: 0,
-        liked: false,
-        isEdit: false,
+    const fetchPromise = fetch('https://wedev-api.sky.pro/api/v1/:ann-kurymshina/comments', {
+        method: "POST",
+        body: JSON.stringify({
+            text: textInputElement().value,
+            name: nameInputElement().value,
+        }),
     });
+    isLoading = true;
+    renderAddForm();
 
-    renderComments();
-
-    nameInputElement.value = '';
-    textInputElement.value = '';
-
-    nameInputElement.focus();
+    fetchPromise.then((response) => {
+        response.json().then((responseData) => {
+            console.log(responseData);
+            requestComment();
+        });
+    });
 };
 
 function formatDateTime(date) {
@@ -218,4 +250,6 @@ function commentsDel() {
             (0, newOldListHtml.lastIndexOf('<li class="comment">')));
 };
 
+requestComment();
+renderAddForm();
 

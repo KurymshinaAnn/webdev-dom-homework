@@ -247,10 +247,13 @@ function comments() {
     }).catch((error) => {
         isCreating = false;
         renderAddForm(comment.name, comment.text);
-        if(error.name === "APIError"){
-            alert(error.message);
-        }
-        else{
+        if (error.name === "APIError") {
+            if (error.message === "Сервер сломался, попробуй позже") {
+                comments();
+            } else {
+                alert(error.message);
+            }
+        } else {
             alert("Кажется, у вас сломался интернет, попробуйте позже");
         }
         console.warn(error);
@@ -280,7 +283,7 @@ function commentsDel() {
             (0, newOldListHtml.lastIndexOf('<li class="comment">')));
 };
 
-function createError(message){
+function createError(message) {
     const err = new Error(message);
     err.name = "APIError";
     return err;

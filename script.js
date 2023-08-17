@@ -82,7 +82,7 @@ const renderComments = () => {
     }
 };
 
-const renderAddForm = () => {
+const renderAddForm = (name = '', text = '') => {
     if (isCreating) {
         addFormElement.innerHTML = `
         <div class="add-form-info">
@@ -93,9 +93,9 @@ const renderAddForm = () => {
         </div>`
     } else {
         addFormElement.innerHTML = `
-        <input type="text" class="add-form-name" id="name-input" ; placeholder="Введите ваше имя" />
-        <textarea type="textarea" class="add-form-text" id="text-input" ; placeholder="Введите ваш коментарий"
-          rows="4"></textarea>
+        <input type="text" class="add-form-name" id="name-input" placeholder="Введите ваше имя" value="${name}"/>
+        <textarea type="textarea" class="add-form-text" id="text-input" placeholder="Введите ваш коментарий"
+          rows="4">${text}</textarea>
         <div class="add-form-row">
           <button class="add-form-button" id="add-button">Написать</button>
         </div>`
@@ -220,6 +220,7 @@ function comments() {
     const comment = {
         text: textInputElement().value,
         name: nameInputElement().value,
+        forceError: true,
     }
 
     isCreating = true;
@@ -227,9 +228,15 @@ function comments() {
 
     fetch('https://wedev-api.sky.pro/api/v1/:ann-kurymshina/comments', {
         method: "POST",
-        body: JSON.stringify(comment),
+        body: JSON.stringify(comment)
     }).then((response) => {
-        response.json();
+        if (response.status === 201) {
+            response.json();
+        } else if (response.status === 400) {
+            throw createError("Имя и комментарий должны быть не короче 3 символов");
+        } else {
+            throw createError("Сервер сломался, попробуй позже");
+        }
     }).then((responseData) => {
         return requestComment();
     }).then((comments) => {
@@ -237,7 +244,17 @@ function comments() {
         isCreating = false;
         renderAddForm();
         renderComments();
-    })
+    }).catch((error) => {
+        isCreating = false;
+        renderAddForm(comment.name, comment.text);
+        if(error.name === "APIError"){
+            alert(error.message);
+        }
+        else{
+            alert("Кажется, у вас сломался интернет, попробуйте позже");
+        }
+        console.warn(error);
+    });
 };
 
 function formatDateTime(date) {
@@ -263,6 +280,11 @@ function commentsDel() {
             (0, newOldListHtml.lastIndexOf('<li class="comment">')));
 };
 
+function createError(message){
+    const err = new Error(message);
+    err.name = "APIError";
+    return err;
+}
 loadComments();
 renderAddForm();
 

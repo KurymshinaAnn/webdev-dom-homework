@@ -1,7 +1,40 @@
+import { formatDateTime } from './utils.js';
+
 const listElement = document.getElementById('list');
 const addFormElement = document.getElementById('add-form');
+const authDiv = document.getElementById("auth-form");
 
-export const renderAddForm = (isCreating, name = '', text = '') => {
+
+export const renderAuthForm = () => {
+  authDiv.innerHTML = `<div class="add-form-login">
+  <p class="add-form-login-text">Форма входа</p>
+  <input type="text" class="add-form-sign-in-name" id="user-login" placeholder="Имя пользователя">
+  <input type="password" class="add-form-sign-in-name" id="user-password" placeholder="Пароль">
+  <button class="add-form-sign-in-button" id="add-button-login">Войти</button>
+  <a class="add-form-sign-up" id="reg-button">Зарегистрироваться</a>
+  </div>`
+};
+
+export const renderRegForm = () => {
+  authDiv.innerHTML = `<div class="add-form-login">
+  <p class="add-form-login-text">Форма регистрации</p>
+  <input type="text" class="add-form-sign-in-name" id="user-name" placeholder="Введите Имя пользователя">
+  <input type="text" class="add-form-sign-in-name" id="user-login" placeholder="Введите логин">
+  <input type="password" class="add-form-sign-in-name" id="user-password" placeholder="Введите пароль">
+  <button class="add-form-sign-in-button" id="add-button-reg">Зарегистрироваться</button>
+  <a class="add-form-sign-up" id="login-button">Войти</a>
+  </div>`
+};
+
+export const renderAddForm = (isCreating, user, name = '', text = '') => {
+  if (user === null){
+    addFormElement.innerHTML = `
+    <div class="registration-block">
+    <p>Что бы добавить комментарий, <a class="registration-link" id="registration-link">зарегистрируйтесь</a>.</p>
+    </div>`
+    return;
+  }
+
   if (isCreating) {
       addFormElement.innerHTML = `
       <div class="add-form-info">
@@ -12,7 +45,7 @@ export const renderAddForm = (isCreating, name = '', text = '') => {
       </div>`
   } else {
       addFormElement.innerHTML = `
-      <input type="text" class="add-form-name" id="name-input" placeholder="Введите ваше имя" value="${name}"/>
+      <input type="text" class="add-form-name" id="name-input" placeholder="Введите ваше имя" disabled value="${user.name}"/>
       <textarea type="textarea" class="add-form-text" id="text-input" placeholder="Введите ваш коментарий"
         rows="4">${text}</textarea>
       <div class="add-form-row">
@@ -66,20 +99,4 @@ const renderCommentsText = (comment) => {
       ${renderedText}
       </div>`
   }
-};
-
-const formatDateTime = (date) => {
-  let day = '' + date.getDate();
-  let month = '' + (date.getMonth() + 1);
-  let year = ('' + date.getFullYear()).substring(2);
-  let hours = date.getHours();
-  let minutes = '' + date.getMinutes();
-
-  if (day.length < 2)
-    day = '0' + day;
-  if (month.length < 2)
-    month = '0' + month;
-  if (minutes.length < 2)
-    minutes = '0' + minutes;
-  return `${day}.${month}.${year} ${hours}:${minutes}`;
 };

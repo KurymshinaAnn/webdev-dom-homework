@@ -25,9 +25,11 @@ body {
 .add-form {
   width: 596px;
   box-sizing: border-box;
-  background: radial-gradient(75.42% 75.42% at 50% 42.37%,
-      rgba(53, 53, 53, 0) 22.92%,
-      #7334ea 100%);
+  background: radial-gradient(
+    75.42% 75.42% at 50% 42.37%,
+    rgba(53, 53, 53, 0) 22.92%,
+    #7334ea 100%
+  );
   filter: drop-shadow(0px 20px 67px rgba(0, 0, 0, 0.08));
   border-radius: 20px;
 }
@@ -193,20 +195,22 @@ body {
 .add-form-login {
   width: 596px;
   box-sizing: border-box;
-  background: radial-gradient(75.42% 75.42% at 50% 42.37%,
-      rgba(53, 53, 53, 0) 22.92%,
-      #7334ea 100%);
+  background: radial-gradient(
+    75.42% 75.42% at 50% 42.37%,
+    rgba(53, 53, 53, 0) 22.92%,
+    #7334ea 100%
+  );
   filter: drop-shadow(0px 20px 67px rgba(0, 0, 0, 0.08));
   border-radius: 20px;
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   align-items: center;
   padding: 0px 20px 20px 20px;
 }
 
 .add-form-login-text {
   font-size: 20px;
-  margin: 20px 0px 0px 0px
+  margin: 20px 0px 0px 0px;
 }
 
 .add-form-sign-in-name {
@@ -233,9 +237,9 @@ body {
 .add-form-sign-up {
   font-size: 20px;
   color: #ffffff;
-  background-color: rgba(28,28,28,0);
+  background-color: rgba(28, 28, 28, 0);
   text-decoration: underline;
-  padding-top:  20px;
+  padding-top: 20px;
   display: flex;
 }
 
@@ -245,12 +249,14 @@ body {
   background: #bcec30;
   color: #bcec30;
   border-radius: 50%;
-  box-shadow: 13.4px 0,-26.9px 0;
+  box-shadow:
+    13.4px 0,
+    -26.9px 0;
   margin-left: -45px;
   animation: dots-h5boszmd 0.5s infinite linear alternate;
 }
 
-.registration-block{
+.registration-block {
   background: rgba(1, 1, 1, 0);
 }
 
@@ -261,11 +267,15 @@ body {
 
 @keyframes dots-h5boszmd {
   50% {
-     box-shadow: 13.4px 0,-13.4px 0;
+    box-shadow:
+      13.4px 0,
+      -13.4px 0;
   }
 
   100% {
-     box-shadow: 26.9px 0,-13.4px 0;
+    box-shadow:
+      26.9px 0,
+      -13.4px 0;
   }
 }
 
@@ -274,10 +284,10 @@ body {
     transform: rotate(0deg);
   }
   25% {
-    transform: rotate(30deg);;
+    transform: rotate(30deg);
   }
   75% {
-    transform: rotate(-30deg);;
+    transform: rotate(-30deg);
   }
   to {
     transform: rotate(0deg);

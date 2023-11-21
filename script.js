@@ -1,20 +1,28 @@
 'use strict';
 
-import { createComment, getComments } from './api.js';
-import { renderComments, renderAddForm } from './view.js';
+import { createComment, getComments, apiRegistration, apiLogin } from './api.js';
+import { renderAuthForm, renderRegForm, renderComments, renderAddForm } from './view.js';
 import { delay } from './utils.js';
 
 let commentsStore = [];
 let isLoading = true;
 let isCreating = false;
+let user = null;
 
 const nameInputElement = () => document.getElementById('name-input');
 const textInputElement = () => document.getElementById('text-input');
 const buttonElement = () => document.getElementById('add-button');
+const regLink = () => document.getElementById('registration-link');
+const logButton = () => document.getElementById('login-button');
+const regButton = () => document.getElementById('reg-button');
+
+const commentList = document.getElementById('list');
+const addForm = document.getElementById('add-form');
+const authForm = document.getElementById('auth-form');
 
 const loadComments = () => {
     displayComments();
-    getComments().then(comments => {
+    getComments(user).then(comments => {
         commentsStore = comments;
         isLoading = false;
         displayComments();
@@ -22,6 +30,8 @@ const loadComments = () => {
 };
 
 const displayComments = () => {
+    commentList.style.display = "block";
+    authForm.style.display = "none";
     renderComments(commentsStore, isLoading);
     initEventListeners();
 }
@@ -30,6 +40,7 @@ const initEventListeners = () => {
     initLikeListeners();
     initEditListeners();
     initAnswerComments();
+    registrationLink();
 };
 
 const initLikeListeners = () => {
@@ -83,8 +94,9 @@ const initAnswerComments = () => {
 };
 
 const displayAddForm = (name = '', text = '') => {
-    renderAddForm(isCreating, name, text);
-    if(!isCreating){
+    addForm.style.display = "flex";
+    renderAddForm(isCreating, user, name, text);
+    if (!isCreating) {
         initFormListeners();
     }
 };
@@ -136,8 +148,8 @@ const addComment = () => {
     isCreating = true;
     displayAddForm();
 
-    createComment(comment).then(() => {
-        return getComments();
+    createComment(comment, user).then(() => {
+        return getComments(user);
     }).then((comments) => {
         commentsStore = comments;
         isCreating = false;
@@ -157,6 +169,95 @@ const addComment = () => {
         }
         console.warn(error);
     });
+};
+
+const registr = () => {
+    const regName = document.getElementById('user-name').value;
+    const regLogin = document.getElementById('user-login').value;
+    const regPassword = document.getElementById('user-password').value;
+
+    if (regName === '' || regLogin === '' || regPassword === '') {
+        alert('Заполните пустые поля');
+        return;
+    }
+
+    const regRequest = {
+        "login": regLogin,
+        "name": regName,
+        "password": regPassword
+    }
+
+    apiRegistration(regRequest)
+        .then((result) => {
+            user = result.user;
+            loadComments();
+            displayAddForm();
+        })
+        .catch((error) => {
+            alert(error);
+        })
+};
+
+const login = () => {
+    const loginValue = document.getElementById('user-login').value;
+    const passwordValue = document.getElementById('user-password').value;
+
+    if (loginValue === '' || passwordValue === '') {
+        alert('Заполните пустые поля');
+        return;
+    }
+
+    apiLogin(loginValue, passwordValue)
+        .then((result) => {
+            user = result.user;
+            loadComments();
+            displayAddForm();
+        })
+        .catch((error) => {
+            alert(error);
+        })
+};
+
+const registrationForm = () => {
+    authForm.style.display = "block";
+    commentList.style.display = "none";
+    addForm.style.display = "none";
+    renderRegForm();
+    document.getElementById('add-button-reg')
+        .addEventListener('click', registr);
+    loginButton();
+};
+
+const loginForm = () => {
+    commentList.style.display = "none";
+    addForm.style.display = "none";
+    renderAuthForm();
+    document.getElementById('add-button-login')
+        .addEventListener('click', login);
+    registrationButton();
+};
+
+const registrationLink = () => {
+    const link = regLink();
+    if (link != null) {
+        link.addEventListener('click', registrationForm);
+    };
+};
+
+const loginButton = () => {
+    const log = logButton();
+    if (log != null) {
+        log.addEventListener('click', () => {
+            loginForm();
+        });
+    };
+};
+
+const registrationButton = () => {
+    const reg = regButton();
+    if (reg != null) {
+        reg.addEventListener('click', registrationForm);
+    };
 };
 
 loadComments();
